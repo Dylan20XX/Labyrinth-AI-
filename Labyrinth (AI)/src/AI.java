@@ -122,6 +122,7 @@ public class AI extends Player{
 		}
 		
 	}
+
 	
 	private void goToTreasure() {
 		

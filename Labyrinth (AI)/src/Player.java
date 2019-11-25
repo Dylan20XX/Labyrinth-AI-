@@ -24,6 +24,10 @@ public class Player extends JLabel {
 		
 	}
 	
+	//Empty Constructor
+	public Player() {
+	}
+
 	//Getters and Setters
 	public ArrayList<Card> getHand() {
 		return hand;
@@ -56,7 +60,19 @@ public class Player extends JLabel {
 	public void setInGame(boolean inGame) {
 		this.inGame = inGame;
 	}
-
+	
+	//This method is used to copy players
+	public void copy(Player playerToCopy) {
+		
+		getHand().clear();
+		
+		for(int i = 0; i < playerToCopy.getHand().size(); i++)
+			getHand().add(playerToCopy.getHand().get(i));
+		
+		setRow(playerToCopy.getRow());
+		setCol(playerToCopy.getCol());
+	}
+	
 	//This method places 5 cards in the player's hand
 	private void drawHand() {
 		

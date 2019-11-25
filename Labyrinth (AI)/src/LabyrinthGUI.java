@@ -30,7 +30,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener{
 
 	//60x60 tiles 540x540 board
 	private JLayeredPane boardPanel = new JLayeredPane();
-	private Board board = new Board();
+	public static Board board = new Board();
 
 	//Card Panel
 	private JPanel cardPanel = new JPanel();
@@ -38,9 +38,9 @@ public class LabyrinthGUI extends JFrame implements ActionListener{
 	private JLabel player2CardHeading = new JLabel("P2");
 	private JLabel player3CardHeading = new JLabel("P3");
 	private JLabel player4CardHeading = new JLabel("P4");
-	private Player[] players = new Player[4];
+	public static Player[] players = new Player[4];
 
-	private Tile tileInHand;
+	public static Tile tileInHand;
 	private JLabel tileInHandLabel = new JLabel();
 	private int turn; //Determines whose turn it is
 	private int phase; // 0 = time to place tile & 1 = time to move character

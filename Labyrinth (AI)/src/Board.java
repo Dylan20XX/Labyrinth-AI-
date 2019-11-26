@@ -261,20 +261,20 @@ public class Board {
 		for(int i = 1; i < adj.length; i++) {
 			
 			//Convert the node number back to a row and column number
-    		int row = i / 7 + 1;
-    		int col = i % 7;
+    		int row = nodeNumToRow(i);
+    		int col = nodeNumToCol(i);
     		
     		//Error check since col number will be set to 0 if col is divisible by 7
     		//Row number will also be 1 higher than it should be
-    		if(col == 0) {
-    			col = 7;
-    			row -= 1;
-    		}
+//    		if(col == 0) {
+//    			col = 7;
+//    			row -= 1;
+//    		}
     		
     		//Error check since row number will be set to 8 on node 49
-    		if(row == 8) {
-    			row = 7;
-    		}
+//    		if(row == 8) {
+//    			row = 7;
+//    		}
     		
     		//If the tile can be reached, highlight it yellow
 			if(vis[i]) {
@@ -313,20 +313,20 @@ public class Board {
 		while(currentNode != startNode) {
 			
 			//Convert node number to row and column
-    		int row = currentNode / 7 + 1;
-    		int col = currentNode % 7;
+    		int row = nodeNumToRow(currentNode);
+    		int col = nodeNumToCol(currentNode);
     		
     		//Error check since col number will be set to 0 if col is divisible by 7
     		//Row number will also be 1 higher than it should be
-    		if(col == 0) {
-    			col = 7;
-    			row -= 1;
-    		}
+//    		if(col == 0) {
+//    			col = 7;
+//    			row -= 1;
+//    		}
     		
     		//Error check since row number will be set to 8 on node 49
-    		if(row == 8) {
-    			row = 7;
-    		}
+//    		if(row == 8) {
+//    			row = 7;
+//    		}
 			
 			shortestPath.add(new Position(row, col)); //Add the current position to the array list
 			currentNode = parentNodes.get(currentNode); //Set the current node to the one before it on the path
@@ -343,6 +343,36 @@ public class Board {
 	
 	//AI METHODS BELOW
 	
+	//This method converts node numbers to row numbers
+	public int nodeNumToRow(int nodeNum) {
+		
+		//Convert the node number back to a row and column number
+		int row = nodeNum / 7 + 1;
+		
+		//Row number will be 1 higher than it should be if the node num is divisible by 7
+		if(nodeNum % 7 == 0) {
+			row -= 1;
+		}
+		
+		return row;
+		
+	}
+	
+	//This method converts node numbers to column numbers
+	public int nodeNumToCol(int nodeNum) {
+		
+		//Convert the node number back to a row and column number
+		int col = nodeNum % 7;
+		
+		//Error check since col number will be set to 0 if col is divisible by 7
+		if(col == 0) {
+			col = 7;
+		}
+		
+		return col;
+		
+	}
+	
 	//This method return an int equal to the number of treasures that can be reached without moving a tile
 	public int checkDirectTreasurePath(ArrayList<Card> hand) {
 		
@@ -352,20 +382,8 @@ public class Board {
 		for(int i = 1; i < adj.length; i++) {
 			
 			//Convert the node number back to a row and column number
-    		int row = i / 7 + 1;
-    		int col = i % 7;
-    		
-    		//Error check since col number will be set to 0 if col is divisible by 7
-    		//Row number will also be 1 higher than it should be
-    		if(col == 0) {
-    			col = 7;
-    			row -= 1;
-    		}
-    		
-    		//Error check since row number will be set to 8 on node 49
-    		if(row == 8) {
-    			row = 7;
-    		}
+    		int row = nodeNumToRow(i);
+    		int col = nodeNumToCol(i);
     		
     		//If the tile can be reached, highlight it yellow
 			if(vis[i]) {
@@ -387,125 +405,5 @@ public class Board {
 		return numTreasures;
 		
 	}
-	
-	//This method simulates each possible move that the AI player can make
-//	private void simulate(Tile tile) {
-//		
-//		Tile tileInHand = new Tile();
-//		tileInHand.copy(tile);
-//		
-//		for(int c = 0; c < 12; c++) {
-//			
-//			//Push a column down
-//			for(int i = 0; i < 3; i++) { 
-//
-//				if(c == i) {
-//
-//					int col = (i + 1) * 2;
-//
-//					board[0][col].copy(tileInHand);
-//					pushColDown(col);
-//
-//					tileInHand.copy(board[8][col]);
-//
-//					board[8][col] = new Tile();
-//
-//					//Move a player if they are on the selected column
-//					for(int j = 0; j < 4; j++) {
-//						if(players[j].getCol() == col) {
-//							players[j].setRow(players[j].getRow() + 1);
-//							if(players[j].getRow() == 8)
-//								players[j].setRow(1);
-//							updatePlayerLocation(j);
-//						}
-//					}
-//
-//				}
-//			}
-//
-//			//Push a row left
-//			for(int i = 3; i < 6; i++) { 
-//
-//				if(selectedPush == i) {
-//
-//					int row = (i - 2) * 2;
-//
-//					board.getBoard()[row][8].copy(tileInHand);
-//					board.pushRowLeft(row);
-//
-//					tileInHand.copy(board.getBoard()[row][0]);
-//
-//					board.getBoard()[row][0] = new Tile();
-//
-//					//Move a player if they are on the selected row
-//					for(int j = 0; j < 4; j++) {
-//						if(players[j].getRow() == row) {
-//							players[j].setCol(players[j].getCol() - 1);
-//							if(players[j].getCol() == 0)
-//								players[j].setCol(7);
-//							updatePlayerLocation(j);
-//						}
-//					}
-//
-//				}
-//			}
-//
-//			//Push a column up
-//			for(int i = 6; i < 9; i++) {
-//
-//				if(selectedPush == i) {
-//
-//					int col = (9 - i) * 2;
-//
-//					board.getBoard()[8][col].copy(tileInHand);
-//					board.pushColUp(col);
-//
-//					tileInHand.copy(board.getBoard()[0][col]);
-//
-//					board.getBoard()[0][col] = new Tile();
-//
-//					//Move a player if they are on the selected column
-//					for(int j = 0; j < 4; j++) {
-//						if(players[j].getCol() == col) {
-//							players[j].setRow(players[j].getRow() - 1);
-//							if(players[j].getRow() == 0)
-//								players[j].setRow(7);
-//							updatePlayerLocation(j);
-//						}
-//					}
-//
-//				}
-//			}
-//
-//			//Push a row right
-//			for(int i = 9; i < 12; i++) {
-//
-//				if(selectedPush == i) {
-//
-//					int row = (12 - i) * 2;
-//
-//					board.getBoard()[row][0].copy(tileInHand);
-//					board.pushRowRight(row);
-//
-//					tileInHand.copy(board.getBoard()[row][8]);
-//
-//					board.getBoard()[row][8] = new Tile();
-//
-//					//Move a player if they are on the selected row
-//					for(int j = 0; j < 4; j++) {
-//						if(players[j].getRow() == row) {
-//							players[j].setCol(players[j].getCol() + 1);
-//							if(players[j].getCol() == 8)
-//								players[j].setCol(1);
-//							updatePlayerLocation(j);
-//						}
-//					}
-//
-//				}
-//			}
-//			
-//		}
-//		
-//	}
 	
 }

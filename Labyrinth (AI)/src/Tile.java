@@ -274,6 +274,7 @@ public class Tile extends JButton implements Cloneable{
 			Tile tile = new Tile();
 
 			tile.copy(tiles[28]);
+			tile.setRotation(r.nextInt(4));
 
 			tileDeck.add(tile);
 
@@ -285,6 +286,7 @@ public class Tile extends JButton implements Cloneable{
 			Tile tile = new Tile();
 
 			tile.copy(tiles[29]);
+			tile.setRotation(r.nextInt(4));
 
 			tileDeck.add(tile);
 

@@ -26,8 +26,13 @@ public class AI extends Player{
 	private int handSizes[] = new int[3];
 	
 	//Movement decision variables
-	private int treasure; // add 10 for every treasure that can be reached with a move
+	private int treasuresAvailable; // add 10 for every treasure that can be reached with a move
 	private int playersBlocked; // add 5 for every player blocked from reaching any treasure next move
+	
+	private int push;
+	private int rotation;
+	private int selectedRow;
+	private int selectedCol;
 	
 	
 	public AI(ImageIcon image, int row, int col, int playerNum) {
@@ -86,14 +91,15 @@ public class AI extends Player{
 		
 		//Analyze the game state to chose best move
 		
-		int treasuresAvailable = 0;
-		
 		//Analyze the game state
 		
 	}
 	
 	//This method is used to copy the board from the GUI
 	private void analyzeGameState() {
+		
+		board.pathfind(getRow(), getCol());
+		treasuresAvailable = 0;
 		
 		//If you have more than 2 cards and another player(s) has 2 or less, try to block that player(s)
 		if(getHand().size() > 2 && (handSizes[0] <= 2 || handSizes[1] <= 2 || handSizes[2] <= 2)) {
@@ -106,12 +112,18 @@ public class AI extends Player{
 			
 		} else {
 			
-			//Check if there's a direct path to treasure
+			//Check if there's a direct path to treasure - *potential problem - all possible moves may block path
 			//If there's a direct path to treasure, try to create a path that allows you to collect another treasure next turn
 			//If you can't setup a path for next turn, try to block other players
+			if(board.checkDirectTreasurePath(getHand()) > 0) { 
+				
+			}
 			
 			//Check if you can create a direct path to treasure
 			//Choose the option that will create a path to the most treasures and go for the one closest to the middle
+//			else if() {
+//				
+//			}
 			
 			//Check if there are no treasures that can be reached this move
 			//Try to create a path that will allow you to get a treasure next move
@@ -132,7 +144,315 @@ public class AI extends Player{
 		
 	}
 	
+	private void checkIndirectTreasurePaths(Tile tileInHand) {
+		
+		Tile tile = new Tile();
+		tile.copy(tileInHand);
+		
+		for(int c = 0; c < 12; c++) {
+			
+			//Push a column down
+			for(int i = 0; i < 3; i++) { 
+
+				if(c == i) {
+					
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+						
+						int col = (i + 1) * 2;
+
+						board.getBoard()[0][col].copy(tile);
+						board.pushColDown(col);
+
+						tile.copy(board.getBoard()[8][col]);
+
+						board.getBoard()[8][col] = new Tile();
+
+						//Move a player if they are on the selected column
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getCol() == col) {
+								players[j].setRow(players[j].getRow() + 1);
+								if(players[j].getRow() == 8)
+									players[j].setRow(1);
+								//updatePlayerLocation(j);
+							}
+						}
+						
+						//NEW ============================
+						board.pathfind(getRow(), getCol());
+						if(board.checkDirectTreasurePath(getHand()) > 0) { 
+							
+						}
+						//NEW ============================
+						
+					}
+
+				}
+			}
+
+			//Push a row left
+			for(int i = 3; i < 6; i++) { 
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int row = (i - 2) * 2;
+
+						board.getBoard()[row][8].copy(tile);
+						board.pushRowLeft(row);
+
+						tile.copy(board.getBoard()[row][0]);
+
+						board.getBoard()[row][0] = new Tile();
+
+						//Move a player if they are on the selected row
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getRow() == row) {
+								players[j].setCol(players[j].getCol() - 1);
+								if(players[j].getCol() == 0)
+									players[j].setCol(7);
+								//updatePlayerLocation(j);
+							}
+						}
+						
+					}
+					
+				}
+			}
+
+			//Push a column up
+			for(int i = 6; i < 9; i++) {
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int col = (9 - i) * 2;
+
+						board.getBoard()[8][col].copy(tile);
+						board.pushColUp(col);
+
+						tile.copy(board.getBoard()[0][col]);
+
+						board.getBoard()[0][col] = new Tile();
+
+						//Move a player if they are on the selected column
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getCol() == col) {
+								players[j].setRow(players[j].getRow() - 1);
+								if(players[j].getRow() == 0)
+									players[j].setRow(7);
+								//updatePlayerLocation(j);
+							}
+						}
+
+					}
+					
+				}
+			}
+
+			//Push a row right
+			for(int i = 9; i < 12; i++) {
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int row = (12 - i) * 2;
+
+						board.getBoard()[row][0].copy(tile);
+						board.pushRowRight(row);
+
+						tile.copy(board.getBoard()[row][8]);
+
+						board.getBoard()[row][8] = new Tile();
+
+						//Move a player if they are on the selected row
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getRow() == row) {
+								players[j].setCol(players[j].getCol() + 1);
+								if(players[j].getCol() == 8)
+									players[j].setCol(1);
+								//updatePlayerLocation(j);
+							}
+						}
+					
+					}
+
+				}
+			}
+			
+		}
+		
+	}	
 	
+	//This method simulates each possible move that the AI player can make
+	private void simulate(Tile tileInHand) {
+		
+		Tile tile = new Tile();
+		tile.copy(tileInHand);
+		
+		for(int c = 0; c < 12; c++) {
+			
+			//Push a column down
+			for(int i = 0; i < 3; i++) { 
+
+				if(c == i) {
+					
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+						
+						int col = (i + 1) * 2;
+
+						board.getBoard()[0][col].copy(tile);
+						board.pushColDown(col);
+
+						tile.copy(board.getBoard()[8][col]);
+
+						board.getBoard()[8][col] = new Tile();
+
+						//Move a player if they are on the selected column
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getCol() == col) {
+								players[j].setRow(players[j].getRow() + 1);
+								if(players[j].getRow() == 8)
+									players[j].setRow(1);
+								//updatePlayerLocation(j);
+							}
+						}
+						
+					}
+
+				}
+			}
+
+			//Push a row left
+			for(int i = 3; i < 6; i++) { 
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int row = (i - 2) * 2;
+
+						board.getBoard()[row][8].copy(tile);
+						board.pushRowLeft(row);
+
+						tile.copy(board.getBoard()[row][0]);
+
+						board.getBoard()[row][0] = new Tile();
+
+						//Move a player if they are on the selected row
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getRow() == row) {
+								players[j].setCol(players[j].getCol() - 1);
+								if(players[j].getCol() == 0)
+									players[j].setCol(7);
+								//updatePlayerLocation(j);
+							}
+						}
+						
+					}
+					
+				}
+			}
+
+			//Push a column up
+			for(int i = 6; i < 9; i++) {
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int col = (9 - i) * 2;
+
+						board.getBoard()[8][col].copy(tile);
+						board.pushColUp(col);
+
+						tile.copy(board.getBoard()[0][col]);
+
+						board.getBoard()[0][col] = new Tile();
+
+						//Move a player if they are on the selected column
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getCol() == col) {
+								players[j].setRow(players[j].getRow() - 1);
+								if(players[j].getRow() == 0)
+									players[j].setRow(7);
+								//updatePlayerLocation(j);
+							}
+						}
+
+					}
+					
+				}
+			}
+
+			//Push a row right
+			for(int i = 9; i < 12; i++) {
+
+				if(c == i) {
+
+					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
+						
+						copyBoard(LabyrinthGUI.board); //Copy the current game board
+						
+						tile.setRotation(k); //Set the tile rotation
+					
+						int row = (12 - i) * 2;
+
+						board.getBoard()[row][0].copy(tile);
+						board.pushRowRight(row);
+
+						tile.copy(board.getBoard()[row][8]);
+
+						board.getBoard()[row][8] = new Tile();
+
+						//Move a player if they are on the selected row
+						for(int j = 0; j < 4; j++) {
+							if(players[j].getRow() == row) {
+								players[j].setCol(players[j].getCol() + 1);
+								if(players[j].getCol() == 8)
+									players[j].setCol(1);
+								//updatePlayerLocation(j);
+							}
+						}
+					
+					}
+
+				}
+			}
+			
+		}
+		
+	}	
 	
 	//This method is used to copy the board from the GUI
 	private void copyBoard(Board boardToCopy) {

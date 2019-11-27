@@ -378,28 +378,63 @@ public class Board {
 		
 		int numTreasures = 0;
 		
-        //Highlight available tiles
+        //Check available tiles
 		for(int i = 1; i < adj.length; i++) {
 			
 			//Convert the node number back to a row and column number
     		int row = nodeNumToRow(i);
     		int col = nodeNumToCol(i);
     		
-    		//If the tile can be reached, highlight it yellow
+    		//If the tile can be reached, check if has a needed treasure
 			if(vis[i]) {
         		
 				for(Card currentCard: hand) {
 					
+					//If the tile has a needed treasure, increment numTreasures
 					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
 						numTreasures++;
 					}
 					
 				}
 				
-            } else { 
-            	//Highlight unreachable tiles with blue
-            	highlight[row][col].setIcon(Assets.tileHighlightBlue);
             }
+			
+        }
+		
+		return numTreasures;
+		
+	}
+	
+	//This method return an int equal to the number of needed treasures in a 5x5 square around the selected tile
+	public int nearbyTreasures(ArrayList<Card> hand, int playerRow, int playerCol) {
+		
+		int numTreasures = 0;
+
+        //Highlight available tiles
+		for(int row = playerRow - 2; row < 8 && row < playerRow + 3; row++) {
+			
+			//Make sure row is at least 1
+			while(row < 1) {
+				row++;
+			}
+			
+			for(int col = playerCol - 2; col < 8 && col < playerCol + 3; col++) {
+				
+				//Make sure col is at least 1
+				while(col < 1) {
+					col++;
+				}
+				
+				for(Card currentCard: hand) {
+					
+					//If the tile has a needed treasure, increment numTreasures
+					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
+						numTreasures++;
+					}
+					
+				}
+				
+			}
         }
 		
 		return numTreasures;

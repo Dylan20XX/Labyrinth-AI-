@@ -23,8 +23,8 @@ public class MusicPlayer { // from YouTube by Max O'Didly
 			AudioInputStream audioInput = AudioSystem.getAudioInputStream(Sound);
 			clip = AudioSystem.getClip();
 			clip.open(audioInput);
-			clip.loop(Clip.LOOP_CONTINUOUSLY);
-			clip.start();// start the music
+			//clip.loop(Clip.LOOP_CONTINUOUSLY);
+			//clip.start();// start the music
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -41,7 +41,7 @@ public class MusicPlayer { // from YouTube by Max O'Didly
 			AudioInputStream audioInput2 = AudioSystem.getAudioInputStream(Sound2);
 			clip = AudioSystem.getClip();
 			clip.open(audioInput2);
-			clip.start();// start the music
+			//clip.start();// start the music
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

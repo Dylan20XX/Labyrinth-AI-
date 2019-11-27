@@ -12,6 +12,11 @@ public class Position {
 		this.col = col;
 	}
 	
+	//Empty Constructor Method
+	public Position() {
+		super();
+	}
+	
 	//Getters and Setters
 	public int getRow() {
 		return row;

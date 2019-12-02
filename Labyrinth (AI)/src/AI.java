@@ -412,7 +412,7 @@ public class AI extends Player{
 						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
@@ -441,7 +441,7 @@ public class AI extends Player{
 						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
@@ -471,7 +471,7 @@ public class AI extends Player{
 						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
@@ -501,7 +501,7 @@ public class AI extends Player{
 						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;

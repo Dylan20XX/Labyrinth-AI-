@@ -71,6 +71,8 @@ public class Player extends JLabel {
 		
 		setRow(playerToCopy.getRow());
 		setCol(playerToCopy.getCol());
+		setInGame(playerToCopy.isInGame());
+		
 	}
 	
 	//This method places 5 cards in the player's hand

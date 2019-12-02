@@ -17,8 +17,11 @@ public class Board {
     private boolean vis[] = new boolean[50];
     private Queue<Integer> Q = new LinkedList<Integer>();
     private HashMap<Integer, Integer> parentNodes = new HashMap<Integer, Integer>();
-	
+    private int dis[] = new int[50];
+    
 	private ArrayList<Integer> adj[] = new ArrayList[50]; //Adjacency matrix
+	
+	private boolean vis2[] = new boolean[50];
 	
 	//4 L corner tiles
 	//12 T non-movable treasure tiles
@@ -69,7 +72,18 @@ public class Board {
 	public void setParentNodes(HashMap<Integer, Integer> parentNodes) {
 		this.parentNodes = parentNodes;
 	}
-
+	
+	public void fillEmptyBoard() {
+		
+		for(int row = 0; row < 9; row++) {
+			for(int col = 0; col < 9; col++) {
+				board[row][col] = new Tile();
+				highlight[row][col] = new JLabel();
+			}
+		}
+		
+	}
+	
 	//This method randomly fills the board with tiles
 	public void fillBoard() {
 		
@@ -329,6 +343,7 @@ public class Board {
 //    		}
 			
 			shortestPath.add(new Position(row, col)); //Add the current position to the array list
+			System.out.println("current node = " + currentNode);
 			currentNode = parentNodes.get(currentNode); //Set the current node to the one before it on the path
 			
 		}
@@ -344,7 +359,7 @@ public class Board {
 	//AI METHODS BELOW
 	
 	//This method converts node numbers to row numbers
-	public int nodeNumToRow(int nodeNum) {
+	public static int nodeNumToRow(int nodeNum) {
 		
 		//Convert the node number back to a row and column number
 		int row = nodeNum / 7 + 1;
@@ -359,7 +374,7 @@ public class Board {
 	}
 	
 	//This method converts node numbers to column numbers
-	public int nodeNumToCol(int nodeNum) {
+	public static int nodeNumToCol(int nodeNum) {
 		
 		//Convert the node number back to a row and column number
 		int col = nodeNum % 7;
@@ -379,7 +394,7 @@ public class Board {
 		int numTreasures = 0;
 		
         //Check available tiles
-		for(int i = 1; i < adj.length; i++) {
+		for(int i = 1; i < vis.length; i++) {
 			
 			//Convert the node number back to a row and column number
     		int row = nodeNumToRow(i);
@@ -402,6 +417,65 @@ public class Board {
         }
 		
 		return numTreasures;
+		
+	}
+	
+	//This method return an int equal to the number of treasures that can be reached without moving a tile
+	public ArrayList<String> listDirectTreasurePath(ArrayList<Card> hand) {
+		
+		ArrayList<String> treasures = new ArrayList<String>();
+		
+        //Check available tiles
+		for(int i = 1; i < adj.length; i++) {
+			
+			//Convert the node number back to a row and column number
+    		int row = nodeNumToRow(i);
+    		int col = nodeNumToCol(i);
+    		
+    		//If the tile can be reached, check if has a needed treasure
+			if(vis[i]) {
+        		
+				for(Card currentCard: hand) {
+					
+					//If the tile has a needed treasure, increment numTreasures
+					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
+						treasures.add(currentCard.getTreasure());
+					}
+					
+				}
+				
+            }
+			
+        }
+		
+		return treasures;
+		
+	}
+	
+	//This method return an based on whether or not a treasure can be reached
+	public boolean checkDirectTreasurePath(String treasure) {
+
+		
+        //Check available tiles
+		for(int i = 1; i < adj.length; i++) {
+			
+			//Convert the node number back to a row and column number
+    		int row = nodeNumToRow(i);
+    		int col = nodeNumToCol(i);
+    		
+    		//If the tile can be reached, check if has a needed treasure
+			if(vis[i]) {
+					
+				//If the tile has a needed treasure, increment numTreasures
+				if(board[row][col].getTreasure().equalsIgnoreCase(treasure)) {
+					return true;
+				}
+				
+            }
+			
+        }
+		
+		return false;
 		
 	}
 	
@@ -438,6 +512,99 @@ public class Board {
         }
 		
 		return numTreasures;
+		
+	}
+	
+	//This method is used to copy the board from the GUI
+	public void copyBoard(Board boardToCopy) {
+		
+		//Copy the board variables
+		for(int row = 1; row < 8; row++) {
+			for(int col = 1; col < 8; col++) {
+				
+				board[row][col].copy(boardToCopy.getBoard()[row][col]);
+				
+			}
+		}
+		
+	}
+	
+	//This method will be used to find distances to treasure tiles from the tile that the player is on
+	public ArrayList<Integer> pathfindDis(int row, int col, ArrayList<Card> hand) {
+		
+		ArrayList<Integer> distances = new ArrayList<Integer>(); //Holds distances to treasure tiles
+		
+		//Build the adjacency matrix
+		buildFullAdjacencyMatrix();
+		
+		int nodeNum = (row - 1) * 7 + col; //Start point
+		
+		//Reset the queue, visited array, and distance array
+		Q.clear();
+		for(int i = 0; i < 50; i++) {
+			vis2[i] = false;
+			dis[i] = 0;
+		}
+
+        Q.add(nodeNum);
+        vis2[nodeNum] = true;
+        
+        //Run BFS to check for all pathways
+        while(!Q.isEmpty()) {
+            int cur = Q.poll();
+            for(int v : adj[cur]) {
+            	if(!vis2[v]) {
+            		Q.add(v);
+            		vis2[v] = true;
+            		dis[v] = dis[cur] + 1;
+            		
+            		for(Card currentCard: hand)
+            			if(board[nodeNumToRow(v)][nodeNumToCol(v)].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
+            				distances.add(dis[v]);
+            			}
+            		
+            	}	
+            }
+        }
+        
+        Collections.sort(distances);
+        
+        return distances;
+        
+	}
+	
+	//This method builds the adjacency matrix ignoring openings
+	private void buildFullAdjacencyMatrix() {
+		
+		//Set the node number for each tile
+		for(int row = 1; row < 8; row++) {
+			for(int col = 1; col < 8; col++) {
+				board[row][col].setNodeNum((row - 1) * 7 + col);
+			}
+		}
+		
+		//Clear the adjacency matrix
+		for(int i = 1; i < adj.length; i++) {
+            adj[i].clear();
+        }
+		
+		for(int row = 1; row < 8; row++) {
+			for(int col = 1; col < 8; col++) {
+				
+				//Check if piece to the right is connected
+				if(col != 7) {
+					adj[board[row][col].getNodeNum()].add(board[row][col + 1].getNodeNum());
+					adj[board[row][col + 1].getNodeNum()].add(board[row][col].getNodeNum()); //Undirected graph
+				}
+				
+				//Check if piece below is connected
+				if(row != 7) {
+					adj[board[row][col].getNodeNum()].add(board[row + 1][col].getNodeNum());
+					adj[board[row + 1][col].getNodeNum()].add(board[row][col].getNodeNum()); //Undirected graph
+				}
+				
+			}
+		}
 		
 	}
 	

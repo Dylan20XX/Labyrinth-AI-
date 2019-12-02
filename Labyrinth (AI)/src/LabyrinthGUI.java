@@ -953,13 +953,15 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 				
 				System.out.println("enter pressed");
 				System.out.println("turn " + turn);
-
+				
 				AI p = (AI)(players[turn]);
 				Position movement = p.move();
 				
 				//Set the rotation variable of the tile
 				tileInHand.setRotation(p.getRotation());
-
+				
+				System.out.println("push = " + p.getPush() + " rotation = " + p.getRotation());
+				
 				if(phase == 0) { // && p.getPush() >= 0 && p.getPush() != lastPush && 
 
 					//Push a column down

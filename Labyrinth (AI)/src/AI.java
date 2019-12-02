@@ -43,6 +43,8 @@ public class AI extends Player{
 	private int selectedRow;
 	private int selectedCol;
 	
+	private boolean pathSelected = false;
+	
 	private int shortestTreasureDis;
 	private int numTreasuresShortestDis;
 	
@@ -341,6 +343,7 @@ public class AI extends Player{
 		
 		//If a treasure couldn't be collected, plan for next move
 		if(!treasurePath) {
+			System.out.println("no treasure paths");
 			twoMoveSimulation(tileInHand);
 		} 
 		else {
@@ -406,14 +409,15 @@ public class AI extends Player{
 						tile.setRotation(k); //Set the tile rotation
 						int col = (i + 1) * 2;
 						pushColDown(col, tile);
+						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points);
-						if(movePoints > points || (movePoints == 1 && points <= 1)) {
+						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
-							push = c;
-							rotation = k;
+//							push = c;
+//							rotation = k;
 						}
 					}
 
@@ -434,14 +438,15 @@ public class AI extends Player{
 						tile.setRotation(k); //Set the tile rotation
 						int row = (i - 2) * 2;
 						pushRowLeft(row, tile);
+						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points);
-						if(movePoints > points || (movePoints == 1 && points <= 1)) {
+						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
-							push = c;
-							rotation = k;
+//							push = c;
+//							rotation = k;
 						}
 						
 					}
@@ -463,14 +468,15 @@ public class AI extends Player{
 						tile.setRotation(k); //Set the tile rotation
 						int col = (9 - i) * 2;
 						pushColUp(col, tile);
+						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points);
-						if(movePoints > points || (movePoints == 1 && points <= 1)) {
+						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
-							push = c;
-							rotation = k;
+//							push = c;
+//							rotation = k;
 						}
 
 					}
@@ -492,14 +498,15 @@ public class AI extends Player{
 						tile.setRotation(k); //Set the tile rotation
 						int row = (12 - i) * 2;
 						pushRowRight(row, tile);
+						pathSelected = true;
 						
 						System.out.println("sim push = " + i + " sim rotation = " + k);
-						int movePoints = simulateTileMoveSelection(tileInHand, points);
-						if(movePoints > points || (movePoints == 1 && points <= 1)) {
+						int movePoints = simulateTileMoveSelection(tileInHand, points, c, k);
+						if(pathSelected) {
 							System.out.println("selected move");
 							points = movePoints;
-							push = c;
-							rotation = k;
+//							push = c;
+//							rotation = k;
 						}
 						
 					}
@@ -512,12 +519,14 @@ public class AI extends Player{
 	}
 	
 	//This method simulates movements to each tile and returns a point value
-	private int simulateTileMoveSelection(Tile tileInHand) {
+	private void simulateTileMoveSelection(Tile tileInHand) {
+		
+		Position originalPosition = new Position(getRow(), getCol());
 		
 		//Find paths from the current position on the board
 		board.pathfind(getRow(), getCol());
-		selectedRow = getRow();
-		selectedCol = getCol();
+//		selectedRow = getRow();
+//		selectedCol = getCol();
 		int points = 0; //Max points from move the selected tile placement
 		
 		System.out.println("simulating move selection");
@@ -555,16 +564,19 @@ public class AI extends Player{
 			}
 		}
 		
-		return points;
+		if(points == 0) {
+			selectedRow = originalPosition.getRow();
+			selectedCol = originalPosition.getCol();
+		}
 		
 	}
 	
-	private int simulateTileMoveSelection(Tile tileInHand, int points) {
+	private int simulateTileMoveSelection(Tile tileInHand, int points, int selectedPush, int selectedRotation) {
 		
 		//Find paths from the current position on the board
 		board.pathfind(getRow(), getCol());
-		selectedRow = getRow();
-		selectedCol = getCol();
+//		selectedRow = getRow();
+//		selectedCol = getCol();
 		
 		System.out.println("simulating move selection");
 		//printBoard();
@@ -590,12 +602,19 @@ public class AI extends Player{
 					points = awardedPoints + treasurePoints ;
 					selectedRow = Board.nodeNumToRow(i);
 					selectedCol = Board.nodeNumToCol(i);
+					push = selectedPush;
+					rotation = selectedRotation;
 					System.out.println("selecting " + selectedRow + " " + selectedCol);
 				} else if(awardedPoints == 1 && points <= 1) { //This means that the current tile placement allowed for a move that puts player closest to another treasure(s)
 					points = 1;
 					selectedRow = Board.nodeNumToRow(i);
 					selectedCol = Board.nodeNumToCol(i);
-					System.out.println("selecting " + selectedRow + " " + selectedCol);
+					push = selectedPush;
+					rotation = selectedRotation;
+					System.out.println("selecting with 1 pt" + selectedRow + " " + selectedCol);
+				} else {
+					points = 0; //No better path was found
+					pathSelected = false;
 				}
 				
 			}

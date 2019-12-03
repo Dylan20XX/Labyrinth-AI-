@@ -278,18 +278,6 @@ public class Board {
     		int row = nodeNumToRow(i);
     		int col = nodeNumToCol(i);
     		
-    		//Error check since col number will be set to 0 if col is divisible by 7
-    		//Row number will also be 1 higher than it should be
-//    		if(col == 0) {
-//    			col = 7;
-//    			row -= 1;
-//    		}
-    		
-    		//Error check since row number will be set to 8 on node 49
-//    		if(row == 8) {
-//    			row = 7;
-//    		}
-    		
     		//If the tile can be reached, highlight it yellow
 			if(vis[i]) {
         		highlight[row][col].setIcon(Assets.tileHighlightYellow);
@@ -329,21 +317,9 @@ public class Board {
 			//Convert node number to row and column
     		int row = nodeNumToRow(currentNode);
     		int col = nodeNumToCol(currentNode);
-    		
-    		//Error check since col number will be set to 0 if col is divisible by 7
-    		//Row number will also be 1 higher than it should be
-//    		if(col == 0) {
-//    			col = 7;
-//    			row -= 1;
-//    		}
-    		
-    		//Error check since row number will be set to 8 on node 49
-//    		if(row == 8) {
-//    			row = 7;
-//    		}
 			
 			shortestPath.add(new Position(row, col)); //Add the current position to the array list
-			System.out.println("current node = " + currentNode);
+			//System.out.println("current node = " + currentNode);
 			currentNode = parentNodes.get(currentNode); //Set the current node to the one before it on the path
 			
 		}
@@ -420,72 +396,6 @@ public class Board {
 		
 	}
 	
-	//This method return an int equal to the number of treasures that can be reached without moving a tile
-	public int checkDirectTreasurePath(ArrayList<Card> hand, int a) { //TEST METHOD
-		
-		int numTreasures = 0;
-		
-        //Check available tiles
-		for(int i = 1; i < vis.length; i++) {
-			
-			//Convert the node number back to a row and column number
-    		int row = nodeNumToRow(i);
-    		int col = nodeNumToCol(i);
-    		
-    		//If the tile can be reached, check if has a needed treasure
-			if(vis[i]) {
-        		
-				for(Card currentCard: hand) {
-					
-					//If the tile has a needed treasure, increment numTreasures
-					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
-						numTreasures++;
-					}
-					
-				}
-				
-            }
-			
-        }
-		
-		System.out.println(numTreasures + " treasures");
-		
-		return numTreasures;
-		
-	}
-	
-	//This method return an int equal to the number of treasures that can be reached without moving a tile
-	public ArrayList<String> listDirectTreasurePath(ArrayList<Card> hand) {
-		
-		ArrayList<String> treasures = new ArrayList<String>();
-		
-        //Check available tiles
-		for(int i = 1; i < adj.length; i++) {
-			
-			//Convert the node number back to a row and column number
-    		int row = nodeNumToRow(i);
-    		int col = nodeNumToCol(i);
-    		
-    		//If the tile can be reached, check if has a needed treasure
-			if(vis[i]) {
-        		
-				for(Card currentCard: hand) {
-					
-					//If the tile has a needed treasure, increment numTreasures
-					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
-						treasures.add(currentCard.getTreasure());
-					}
-					
-				}
-				
-            }
-			
-        }
-		
-		return treasures;
-		
-	}
-	
 	//This method return an based on whether or not a treasure can be reached
 	public boolean checkDirectTreasurePath(String treasure) {
 
@@ -510,42 +420,6 @@ public class Board {
         }
 		
 		return false;
-		
-	}
-	
-	//This method return an int equal to the number of needed treasures in a 5x5 square around the selected tile
-	public int nearbyTreasures(ArrayList<Card> hand, int playerRow, int playerCol) {
-		
-		int numTreasures = 0;
-
-        //Highlight available tiles
-		for(int row = playerRow - 2; row < 8 && row < playerRow + 3; row++) {
-			
-			//Make sure row is at least 1
-			while(row < 1) {
-				row++;
-			}
-			
-			for(int col = playerCol - 2; col < 8 && col < playerCol + 3; col++) {
-				
-				//Make sure col is at least 1
-				while(col < 1) {
-					col++;
-				}
-				
-				for(Card currentCard: hand) {
-					
-					//If the tile has a needed treasure, increment numTreasures
-					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
-						numTreasures++;
-					}
-					
-				}
-				
-			}
-        }
-		
-		return numTreasures;
 		
 	}
 	

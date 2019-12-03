@@ -71,7 +71,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 
 	//Player animation variables
 	private ArrayList<Position> shortestPath;
-	private Timer moveTimer = new Timer(5, this);
+	private Timer moveTimer = new Timer(3, this);
 	private int moveTime = 0;
 	private int nextMove;
 	private boolean moving = false;
@@ -498,7 +498,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 
 		if(!shortestPath.isEmpty()) {
 
-			System.out.println("Row = " + shortestPath.get(0).getRow() + " Col = " + shortestPath.get(0).getCol());
+			//System.out.println("Row = " + shortestPath.get(0).getRow() + " Col = " + shortestPath.get(0).getCol());
 
 			//Set the next move variable
 			if(shortestPath.get(0).getRow() == players[playerTurn].getRow() - 1) { //Up
@@ -951,8 +951,8 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 			
 			if(e.getKeyCode() == KeyEvent.VK_ENTER && players[turn] instanceof AI) {
 				
-				System.out.println("enter pressed");
-				System.out.println("turn " + turn);
+				System.out.println("\nInitiating AI Move");
+				System.out.println("player " + (turn + 1) + "'s turn");
 				
 				AI p = (AI)(players[turn]);
 				Position movement = p.move();
@@ -960,7 +960,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 				//Set the rotation variable of the tile
 				tileInHand.setRotation(p.getRotation());
 				
-				System.out.println("push = " + p.getPush() + " rotation = " + p.getRotation());
+				//System.out.println("push = " + p.getPush() + " rotation = " + p.getRotation());
 				
 				if(phase == 0) { // && p.getPush() >= 0 && p.getPush() != lastPush && 
 
@@ -1114,7 +1114,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 					//Move to player movement phase
 					nextPhase();
 					
-					System.out.println("travelling to " + movement.getRow() + " " + movement.getCol());
+					//System.out.println("travelling to " + movement.getRow() + " " + movement.getCol());
 					selectedRow = movement.getRow();
 					selectedCol = movement.getCol();
 					movePlayer(turn, selectedRow, selectedCol);

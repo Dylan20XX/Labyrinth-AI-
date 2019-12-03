@@ -29,22 +29,20 @@ public class AI extends Player{
 	private int handSizes[] = new int[3];
 	
 	//Movement decision variables
-	private ArrayList<String> directTreasures = new ArrayList<String>();
-	private int treasuresAvailable; // add 10 for every treasure that can be reached with a move
-	
 	private boolean treasurePath = false; //set in the movePoints() method
 	
 	//Row and col at start of turn
 	private int startRow;
 	private int startCol;
 	
+	//Move decision variables
 	private int push;
 	private int rotation;
 	private int selectedRow;
 	private int selectedCol;
 	
+	//Player move simulation variables
 	private boolean pathSelected = false;
-	
 	private int shortestTreasureDis;
 	private int numTreasuresShortestDis;
 	
@@ -139,8 +137,13 @@ public class AI extends Player{
 		position.setRow(selectedRow);
 		position.setCol(selectedCol);
 		
+		//Return player to starting position
 		copyStartPosition();
+		
+		//Print move details
+		System.out.println("push = " + getPush() + " rotation = " + getRotation());
 		System.out.println("starting position " + startRow + " " + startCol);
+		System.out.println("travelling to " + position.getRow() + " " + position.getCol());
 		
 		//Return the move object
 		return position;
@@ -150,69 +153,24 @@ public class AI extends Player{
 	private void choseActionPriority() {
 		
 		board.pathfind(getRow(), getCol());
-		//treasuresAvailable = 0;
-		treasuresAvailable = board.checkDirectTreasurePath(getHand());
-		directTreasures = board.listDirectTreasurePath(getHand());
 		treasurePath = false;
 		
-		//If you have more than 2 cards and another player(s) has 2 or less, try to block that player(s)
-		//if(getHand().size() > 2 && (handSizes[0] <= 2 || handSizes[1] <= 2 || handSizes[2] <= 2)) {
+		if(getHand().size() >= 2 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { 
 			
-			//block(tileInHand);
-			
-		//} else 
-		if(getHand().size() >= 2 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you have more than 1 card and another player(s) has 1, try to block that player(s)
-			
+			//If you have more than 1 card and another player(s) has 1, try to block that player(s)
 			block(tileInHand);
 			
-		} //else if(getHand().size() == 1 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you and another player(s) has 1 card
+		} else {
 			
-			//Try collect last treasure but if you can't, block that player(s)
-			//block(tileInHand);
+			//Simulate each tile placement, checking if it creates or maintains a path to treasure
 			
-		//} 
-		else {
+			//If tile placements create paths that allow you to collect treasures, choose best option 
+			//based on number of treasures on the path and number of players blocked
+			
+			//If there's no path to treasure, try to create a path that allows you to collect another treasure next turn
+			//If you can't collect a treasure next turn, move to a spot that puts you closest to the most treasures
 			
 			checkIndirectTreasurePaths(tileInHand);
-			
-			//Check if there's a direct path to treasure - *potential problem - all possible moves may block path
-			//If there's a direct path to treasure, try to create a path that allows you to collect another treasure next turn
-			//If you can't setup a path for next turn, try to block other players
-			//if(treasuresAvailable > 0) { 
-				
-				//treasurePath = true;
-				
-			//}
-			
-			//Check if you can create a direct path to treasure
-			//Choose the option that will create a path to the most treasures and go for the one closest to the middle
-			//else {
-				
-				//checkIndirectTreasurePaths(tileInHand);
-				
-				//Check if you can create a direct path to treasure
-				//Choose the option that will create a path to the most treasures and go for the one with more treasures nearby
-				//if(treasuresAvailable > 0) { 
-					
-					
-					
-				//Check if there are no treasures that can be reached this move
-				//Try to create a path that will allow you to get a treasure next move
-				//If that can't be done, try to block the player in the lead
-				//} else {
-					
-					
-					
-				//}
-			
-				
-			//}
-			
-			//Check if there are no treasures that can be reached this move
-			//Try to create a path that will allow you to get a treasure next move
-			//If that can't be done, try to block the player in the lead
-			
-			
 			
 		}
 		
@@ -233,7 +191,7 @@ public class AI extends Player{
 			if(c == LabyrinthGUI.lastPush)
 				continue;
 			
-			System.out.println("c = " + c);
+			//System.out.println("c = " + c);
 			
 			//Push a column down
 			for(int i = 0; i < 3; i++) { 
@@ -356,11 +314,12 @@ public class AI extends Player{
 			twoMoveSimulation(tileInHand);
 		} 
 		else {
-			selectMoveTile(); //select the tile to move to - treasure tile
+			selectMoveTile(); //Select the treasure tile to move to
 		}
 		
 	}	
 	
+	//This method is used to select a move after a tile placement allowing for a direct path to treasure is found
 	private void selectMoveTile() {
 		
 		copyBoard(LabyrinthGUI.board); //Copy the current game board and original player position
@@ -387,7 +346,7 @@ public class AI extends Player{
 			pushRowRight(row, tile);
 		}
 		
-		System.out.println("push = " + push + " rotation = " + rotation);
+		//System.out.println("push = " + push + " rotation = " + rotation);
 		simulateTileMoveSelection(tile);
 		
 	}
@@ -420,13 +379,11 @@ public class AI extends Player{
 						pushColDown(col, tile);
 						pathSelected = true;
 						
-						System.out.println("sim push = " + i + " sim rotation = " + k);
+						//System.out.println("sim push = " + i + " sim rotation = " + k);
 						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
-							System.out.println("selected move");
+							//System.out.println("selected move");
 							points = movePoints;
-//							push = c;
-//							rotation = k;
 						}
 					}
 
@@ -449,13 +406,9 @@ public class AI extends Player{
 						pushRowLeft(row, tile);
 						pathSelected = true;
 						
-						System.out.println("sim push = " + i + " sim rotation = " + k);
 						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
-							System.out.println("selected move");
 							points = movePoints;
-//							push = c;
-//							rotation = k;
 						}
 						
 					}
@@ -479,13 +432,9 @@ public class AI extends Player{
 						pushColUp(col, tile);
 						pathSelected = true;
 						
-						System.out.println("sim push = " + i + " sim rotation = " + k);
 						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
-							System.out.println("selected move");
 							points = movePoints;
-//							push = c;
-//							rotation = k;
 						}
 
 					}
@@ -509,13 +458,9 @@ public class AI extends Player{
 						pushRowRight(row, tile);
 						pathSelected = true;
 						
-						System.out.println("sim push = " + i + " sim rotation = " + k);
 						int movePoints = simulateTileMoveSelection(tile, points, c, k);
 						if(pathSelected) {
-							System.out.println("selected move");
 							points = movePoints;
-//							push = c;
-//							rotation = k;
 						}
 						
 					}
@@ -527,20 +472,18 @@ public class AI extends Player{
 		
 	}
 	
-	//This method simulates movements to each tile and returns a point value
+	//This method simulates movements to each tile and selects the best one
 	private void simulateTileMoveSelection(Tile tileInHand) {
 		
 		Position originalPosition = new Position(getRow(), getCol());
 		
 		//Find paths from the current position on the board
 		board.pathfind(getRow(), getCol());
-//		selectedRow = getRow();
-//		selectedCol = getCol();
 		int points = 0; //Max points from move the selected tile placement
 		
-		System.out.println("simulating move selection");
+		//System.out.println("simulating move selection");
 		//printBoard();
-		printVis();
+		//printVis();
 		
 		//Loop through the board's visited array
 		for(int i = 1; i < 50; i++) {
@@ -562,12 +505,12 @@ public class AI extends Player{
 					points = awardedPoints + treasurePoints ;
 					selectedRow = Board.nodeNumToRow(i);
 					selectedCol = Board.nodeNumToCol(i);
-					System.out.println("selecting " + selectedRow + " " + selectedCol);
+					//System.out.println("selecting " + selectedRow + " " + selectedCol);
 				} else if(awardedPoints == 1 && points <= 1) { //This means that the current tile placement allowed for a move that puts player closest to another treasure(s)
 					points = 1;
 					selectedRow = Board.nodeNumToRow(i);
 					selectedCol = Board.nodeNumToCol(i);
-					System.out.println("selecting " + selectedRow + " " + selectedCol);
+					//System.out.println("selecting " + selectedRow + " " + selectedCol);
 				}
 				
 			}
@@ -580,20 +523,20 @@ public class AI extends Player{
 		
 	}
 	
+	//This method simulates movements to each tile and returns a point value
 	private int simulateTileMoveSelection(Tile tileInHand, int points, int selectedPush, int selectedRotation) {
 		
 		//Find paths from the current position on the board
 		board.pathfind(getRow(), getCol());
-//		selectedRow = getRow();
-//		selectedCol = getCol();
 		
-		System.out.println("simulating move selection");
+		//System.out.println("simulating move selection || push = " + selectedPush + " rotation = " + selectedRotation);
 		//printBoard();
-		printVis();
+		//printVis();
 		
 		//Loop through the board's visited array
 		for(int i = 1; i < 50; i++) {
 			if(board.getVis()[i]) {
+				
 				//Move to tiles with a direct path to them
 				setRow(Board.nodeNumToRow(i));
 				setCol(Board.nodeNumToCol(i));
@@ -613,14 +556,14 @@ public class AI extends Player{
 					selectedCol = Board.nodeNumToCol(i);
 					push = selectedPush;
 					rotation = selectedRotation;
-					System.out.println("selecting " + selectedRow + " " + selectedCol);
+					//System.out.println("selecting " + selectedRow + " " + selectedCol);
 				} else if(awardedPoints == 1 && points <= 1) { //This means that the current tile placement allowed for a move that puts player closest to another treasure(s)
 					points = 1;
 					selectedRow = Board.nodeNumToRow(i);
 					selectedCol = Board.nodeNumToCol(i);
 					push = selectedPush;
 					rotation = selectedRotation;
-					System.out.println("selecting with 1 pt" + selectedRow + " " + selectedCol);
+					//System.out.println("selecting with 1 pt" + selectedRow + " " + selectedCol);
 				} else {
 					points = 0; //No better path was found
 					pathSelected = false;
@@ -636,13 +579,12 @@ public class AI extends Player{
 	//This method simulates each possible move that the AI player can make next turn
 	private int checkNextMoves(Tile tileInHand, int points) {
 		
+		//Testing Variables
+		//int plannedPush = -1;
+		//int plannedRotation = 0;
+		
 		if(points == 1)
 			points = 0;
-		
-		//TEST
-		int plannedPush = -1;
-		int plannedRotation = 0;
-		//TEST
 		
 		Player simPlayers[] = new Player[4];
 		
@@ -681,8 +623,8 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
-							plannedPush = c;
-							plannedRotation = k;
+							//plannedPush = c;
+							//plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -692,8 +634,8 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
-								plannedPush = c;
-								plannedRotation = k;
+								//plannedPush = c;
+								//plannedRotation = k;
 							}
 						}
 						
@@ -721,8 +663,6 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
-							plannedPush = c;
-							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -732,8 +672,6 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
-								plannedPush = c;
-								plannedRotation = k;
 							}
 						}
 						
@@ -761,8 +699,6 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
-							plannedPush = c;
-							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -772,8 +708,6 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
-								plannedPush = c;
-								plannedRotation = k;
 							}
 						}
 						
@@ -801,8 +735,6 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
-							plannedPush = c;
-							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -812,8 +744,6 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
-								plannedPush = c;
-								plannedRotation = k;
 							}
 						}
 						
@@ -834,9 +764,9 @@ public class AI extends Player{
 			players[i].copy(simPlayers[i]);
 		}
 		
-		//TEST
-		if(plannedPush != -1)
-			System.out.println("plannedPush = " + plannedPush + " plannedRotation = " + plannedRotation);
+		
+		//if(plannedPush != -1)
+			//System.out.println("plannedPush = " + plannedPush + " plannedRotation = " + plannedRotation);
 		
 		return points;
 		
@@ -850,7 +780,6 @@ public class AI extends Player{
 			for(int col = 1; col < 8; col++) {
 				
 				board.getBoard()[row][col].copy(boardToCopy.getBoard()[row][col]);
-				//System.out.println("copying " + row + " " + col);
 				
 			}
 		}
@@ -969,59 +898,8 @@ public class AI extends Player{
 		
 	}
 	
-	//This method checks the placements of players depending on how many cards they each have
-	private int[] checkPlacement() {
-		
-		//Create the array to be returned and fill it with -1
-		int[] placements = new int[3];
-		Arrays.fill(placements, -1);
-		
-		while(placements[0] == -1 || placements[1] == -1 || placements[2] == -1) {
-		
-			for(int i = 0; i < 4; i++) {
-
-				if(i == playerNum || i == placements[0] || i == placements[1] || i == placements[2]) {
-					continue;
-				}
-				
-				if(placements[0] != -1 && players[i].getHand().size() < players[placements[0]].getHand().size()) {
-					
-					swap(placements, 1, 2);
-					swap(placements, 0, 1);
-					placements[0] = i;
-					
-				} else if(placements[1] != -1 && players[i].getHand().size() < players[placements[1]].getHand().size()) {
-					
-					swap(placements, 1, 2);
-					placements[1] = i;
-					
-				} else {
-					
-					placements[2] = i;
-					
-				}
-
-			}
-		
-		}
-		
-		return placements;
-		
-	}
-	
-	//This method swaps the values of array indexes
-	private void swap(int[] data, int index1, int index2) {
-
-		int temp = data[index1];
-		data[index1] = data[index2];
-		data[index2] = temp;
-
-	}
-	
 	//This method blocks the selected player by trying to prevent the targeted player from having any path to collect a treasure
 	private void block(Tile tileInHand) {
-		
-		System.out.println("blocking");
 		
 		Tile tile = new Tile();
 		tile.copy(tileInHand);
@@ -1031,9 +909,6 @@ public class AI extends Player{
 			
 			if(c == LabyrinthGUI.lastPush)
 				continue;
-			
-			//Test
-			System.out.println("c = " + c);
 			
 			//Push a column down
 			for(int i = 0; i < 3; i++) { 
@@ -1160,10 +1035,10 @@ public class AI extends Player{
 		
 		//Add 20 points for every treasure path opened
 		board.pathfind(getRow(), getCol());
-		points += (board.checkDirectTreasurePath(getHand(), 1) * 20);
+		points += (board.checkDirectTreasurePath(getHand()) * 20);
 		
-		//Add 120 points if the player is blocked
-		//Add 15 points for every other player blocked
+		//Add 100 points if a player with one card is blocked
+		//Add 10 points for every other player blocked
 		for(int i = 0; i < 4; i++) {
 			
 			if(i == playerNum || !players[i].isInGame())
@@ -1187,14 +1062,9 @@ public class AI extends Player{
 		int points = 0;
 		
 		board.pathfind(getRow(), getCol());
-//		Add 100 points for each direct treasure path that was not destroyed
-//		for(String treasure: directTreasures) {
-//			if(board.checkDirectTreasurePath(treasure))
-//				points += 100;
-//		}
 		
 		//Add 30 points for each treasure path created
-		points += (board.checkDirectTreasurePath(getHand(), 1) * 50);
+		points += (board.checkDirectTreasurePath(getHand()) * 50);
 		
 		//Set the treasure path to true if treasures can be obtained
 		if(points > 0 && !treasurePath)
@@ -1206,8 +1076,6 @@ public class AI extends Player{
 			if(i == playerNum || !players[i].isInGame())
 				continue;
 			
-			//System.out.println("Player row and col = " + players[i].getRow() + " " + players[i].getCol() + " \nPlayer num = " + i);
-			//System.out.println("Player row and col = " + LabyrinthGUI.players[i].getRow() + " " + LabyrinthGUI.players[i].getCol() + " \nPlayer num = " + i);
 			board.pathfind(players[i].getRow(), players[i].getCol());
 			if(board.checkDirectTreasurePath(players[i].getHand()) == 0) 
 				points += 10;
@@ -1276,6 +1144,7 @@ public class AI extends Player{
 		setCol(startCol);
 	}
 	
+	//This method copies the players from the LabyrinthGUI class
 	private void copyPlayers() {
 		
 		for(int i = 0; i < 4; i++) {
@@ -1284,6 +1153,7 @@ public class AI extends Player{
 		
 	}
 	
+	//This method is used to copy a given player array
 	private void copyPlayers(Player[] simPlayers) {
 		
 		for(int i = 0; i < 4; i++) {
@@ -1292,6 +1162,7 @@ public class AI extends Player{
 		
 	}
 	
+	//This method is used to print the board while testing
 	private void printBoard() {
 		
 		//Copy the board variables
@@ -1308,7 +1179,8 @@ public class AI extends Player{
 		}
 		
 	}
-
+	
+	//This method is used to print spaces on the board that can be visited while testing
 	private void printVis() {
 		
 
@@ -1328,96 +1200,7 @@ public class AI extends Player{
 				System.out.println();
 				
 			}
-
-		
 		
 	}
-	
-	//This method simulates each possible move that the AI player can make
-	private void simulate(Tile tileInHand) {
-		
-		Tile tile = new Tile();
-		tile.copy(tileInHand);
-		
-		for(int c = 0; c < 12; c++) {
-			
-			//if(c == lastPush)
-			//	continue;
-			
-			//Push a column down
-			for(int i = 0; i < 3; i++) { 
-
-				if(c == i) {
-					
-					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
-						
-						copyBoard(LabyrinthGUI.board); //Copy the current game board
-						tile.copy(tileInHand); //Copy the tile in hand
-						tile.setRotation(k); //Set the tile rotation
-						int col = (i + 1) * 2;
-						pushColDown(col, tile);
-						
-					}
-
-				}
-			}
-
-			//Push a row left
-			for(int i = 3; i < 6; i++) { 
-
-				if(c == i) {
-
-					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
-						
-						copyBoard(LabyrinthGUI.board); //Copy the current game board
-						tile.copy(tileInHand); //Copy the tile in hand
-						tile.setRotation(k); //Set the tile rotation
-						int row = (i - 2) * 2;
-						pushRowLeft(row, tile);
-						
-					}
-					
-				}
-			}
-
-			//Push a column up
-			for(int i = 6; i < 9; i++) {
-
-				if(c == i) {
-
-					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
-						
-						copyBoard(LabyrinthGUI.board); //Copy the current game board
-						tile.copy(tileInHand); //Copy the tile in hand
-						tile.setRotation(k); //Set the tile rotation
-						int col = (9 - i) * 2;
-						pushColUp(col, tile);
-
-					}
-					
-				}
-			}
-
-			//Push a row right
-			for(int i = 9; i < 12; i++) {
-
-				if(c == i) {
-
-					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
-						
-						copyBoard(LabyrinthGUI.board); //Copy the current game board
-						tile.copy(tileInHand); //Copy the tile in hand
-						tile.setRotation(k); //Set the tile rotation
-						int row = (12 - i) * 2;
-						pushRowRight(row, tile);
-					
-					}
-
-				}
-			}
-			
-		}
-		
-	}	
 	
 }

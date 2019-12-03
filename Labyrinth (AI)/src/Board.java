@@ -421,6 +421,40 @@ public class Board {
 	}
 	
 	//This method return an int equal to the number of treasures that can be reached without moving a tile
+	public int checkDirectTreasurePath(ArrayList<Card> hand, int a) { //TEST METHOD
+		
+		int numTreasures = 0;
+		
+        //Check available tiles
+		for(int i = 1; i < vis.length; i++) {
+			
+			//Convert the node number back to a row and column number
+    		int row = nodeNumToRow(i);
+    		int col = nodeNumToCol(i);
+    		
+    		//If the tile can be reached, check if has a needed treasure
+			if(vis[i]) {
+        		
+				for(Card currentCard: hand) {
+					
+					//If the tile has a needed treasure, increment numTreasures
+					if(board[row][col].getTreasure().equalsIgnoreCase(currentCard.getTreasure())) {
+						numTreasures++;
+					}
+					
+				}
+				
+            }
+			
+        }
+		
+		System.out.println(numTreasures + " treasures");
+		
+		return numTreasures;
+		
+	}
+	
+	//This method return an int equal to the number of treasures that can be reached without moving a tile
 	public ArrayList<String> listDirectTreasurePath(ArrayList<Card> hand) {
 		
 		ArrayList<String> treasures = new ArrayList<String>();

@@ -73,6 +73,8 @@ public class Card extends JLabel{
 	
 	public static void deckSetup() {
 		
+		deck.clear();
+		
 		for(int i = 0; i < cards.length; i++) {
 			deck.add(cards[i]);
 		}

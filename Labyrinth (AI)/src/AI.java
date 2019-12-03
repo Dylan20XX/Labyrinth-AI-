@@ -155,21 +155,23 @@ public class AI extends Player{
 		directTreasures = board.listDirectTreasurePath(getHand());
 		treasurePath = false;
 		
-		//If you have more than )2 cards and another player(s) has 2 or less, try to block that player(s)
-		if(getHand().size() > 2 && (handSizes[0] <= 2 || handSizes[1] <= 2 || handSizes[2] <= 2)) {
+		//If you have more than 2 cards and another player(s) has 2 or less, try to block that player(s)
+		//if(getHand().size() > 2 && (handSizes[0] <= 2 || handSizes[1] <= 2 || handSizes[2] <= 2)) {
+			
+			//block(tileInHand);
+			
+		//} else 
+		if(getHand().size() >= 2 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you have more than 1 card and another player(s) has 1, try to block that player(s)
 			
 			block(tileInHand);
 			
-		} else if(getHand().size() <= 2 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you have more than 1 card and another player(s) has 1, try to block that player(s)
-			
-			block(tileInHand);
-			
-		} else if(getHand().size() == 1 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you and another player(s) has 1 card
+		} //else if(getHand().size() == 1 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { //If you and another player(s) has 1 card
 			
 			//Try collect last treasure but if you can't, block that player(s)
-			block(tileInHand);
+			//block(tileInHand);
 			
-		} else {
+		//} 
+		else {
 			
 			checkIndirectTreasurePaths(tileInHand);
 			
@@ -231,9 +233,12 @@ public class AI extends Player{
 			if(c == LabyrinthGUI.lastPush)
 				continue;
 			
+			System.out.println("c = " + c);
+			
 			//Push a column down
 			for(int i = 0; i < 3; i++) { 
-
+				
+				
 				if(c == i) {
 					
 					for(int k = 0; k < 4; k++) { //Loop through each tile rotation
@@ -247,8 +252,9 @@ public class AI extends Player{
 						pushColDown(col, tile);
 						
 						//Award points to the created game state
-						if(movePoints() > points && treasurePath) {
-							points = movePoints();
+						int movePoints = movePoints();
+						if(movePoints > points && treasurePath) {
+							points = movePoints;
 							push = c;
 							rotation = k;
 						}
@@ -274,8 +280,9 @@ public class AI extends Player{
 						pushRowLeft(row, tile);
 						
 						//Award points to the created game state
-						if(movePoints() > points && treasurePath) {
-							points = movePoints();
+						int movePoints = movePoints();
+						if(movePoints > points && treasurePath) {
+							points = movePoints;
 							push = c;
 							rotation = k;
 						}
@@ -301,8 +308,9 @@ public class AI extends Player{
 						pushColUp(col, tile);
 						
 						//Award points to the created game state
-						if(movePoints() > points && treasurePath) {
-							points = movePoints();
+						int movePoints = movePoints();
+						if(movePoints > points && treasurePath) {
+							points = movePoints;
 							push = c;
 							rotation = k;
 						}
@@ -328,8 +336,9 @@ public class AI extends Player{
 						pushRowRight(row, tile);
 						
 						//Award points to the created game state
-						if(movePoints() > points && treasurePath) {
-							points = movePoints();
+						int movePoints = movePoints();
+						if(movePoints > points && treasurePath) {
+							points = movePoints;
 							push = c;
 							rotation = k;
 						}
@@ -630,6 +639,11 @@ public class AI extends Player{
 		if(points == 1)
 			points = 0;
 		
+		//TEST
+		int plannedPush = -1;
+		int plannedRotation = 0;
+		//TEST
+		
 		Player simPlayers[] = new Player[4];
 		
 		for(int i = 0; i < 4; i++) {
@@ -667,6 +681,8 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
+							plannedPush = c;
+							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -676,6 +692,8 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
+								plannedPush = c;
+								plannedRotation = k;
 							}
 						}
 						
@@ -703,6 +721,8 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
+							plannedPush = c;
+							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -712,6 +732,8 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
+								plannedPush = c;
+								plannedRotation = k;
 							}
 						}
 						
@@ -739,6 +761,8 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
+							plannedPush = c;
+							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -748,6 +772,8 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
+								plannedPush = c;
+								plannedRotation = k;
 							}
 						}
 						
@@ -775,6 +801,8 @@ public class AI extends Player{
 						int secondMovePoints = secondMovePoints();
 						if(secondMovePoints > points) {
 							points = secondMovePoints;
+							plannedPush = c;
+							plannedRotation = k;
 						} else if(points == 0) {
 							//If the distance to a treasure is shortest from this position, or equal to shortest distance but has more treasures with this distance
 							// and points are at 0, award it 1 point;
@@ -784,6 +812,8 @@ public class AI extends Player{
 								shortestTreasureDis = treasureDis;
 								numTreasuresShortestDis = numTreasures;
 								points = 1;
+								plannedPush = c;
+								plannedRotation = k;
 							}
 						}
 						
@@ -803,6 +833,10 @@ public class AI extends Player{
 		for(int i = 0; i < 4; i++) {
 			players[i].copy(simPlayers[i]);
 		}
+		
+		//TEST
+		if(plannedPush != -1)
+			System.out.println("plannedPush = " + plannedPush + " plannedRotation = " + plannedRotation);
 		
 		return points;
 		
@@ -987,6 +1021,8 @@ public class AI extends Player{
 	//This method blocks the selected player by trying to prevent the targeted player from having any path to collect a treasure
 	private void block(Tile tileInHand) {
 		
+		System.out.println("blocking");
+		
 		Tile tile = new Tile();
 		tile.copy(tileInHand);
 		int blockPoints = 0;
@@ -995,6 +1031,9 @@ public class AI extends Player{
 			
 			if(c == LabyrinthGUI.lastPush)
 				continue;
+			
+			//Test
+			System.out.println("c = " + c);
 			
 			//Push a column down
 			for(int i = 0; i < 3; i++) { 
@@ -1118,12 +1157,10 @@ public class AI extends Player{
 	private int blockPoints() {
 		
 		int points = 0;
-		int treasures = 0;
 		
 		//Add 20 points for every treasure path opened
 		board.pathfind(getRow(), getCol());
-		treasures = board.checkDirectTreasurePath(getHand());
-		points += (20 * treasures);
+		points += (board.checkDirectTreasurePath(getHand(), 1) * 20);
 		
 		//Add 120 points if the player is blocked
 		//Add 15 points for every other player blocked
@@ -1136,7 +1173,7 @@ public class AI extends Player{
 			if(board.checkDirectTreasurePath(players[i].getHand()) == 0 && players[i].getHand().size() == 1) 
 				points += 100;
 			else if(board.checkDirectTreasurePath(players[i].getHand()) == 0) 
-				points += 15;
+				points += 10;
 			
 		}
 		
@@ -1149,15 +1186,15 @@ public class AI extends Player{
 		
 		int points = 0;
 		
-		//Add 100 points for each direct treasure path that was not destroyed
 		board.pathfind(getRow(), getCol());
-		for(String treasure: directTreasures) {
-			if(board.checkDirectTreasurePath(treasure))
-				points += 100;
-		}
+//		Add 100 points for each direct treasure path that was not destroyed
+//		for(String treasure: directTreasures) {
+//			if(board.checkDirectTreasurePath(treasure))
+//				points += 100;
+//		}
 		
 		//Add 30 points for each treasure path created
-		points += (board.checkDirectTreasurePath(getHand()) * 30);
+		points += (board.checkDirectTreasurePath(getHand(), 1) * 50);
 		
 		//Set the treasure path to true if treasures can be obtained
 		if(points > 0 && !treasurePath)

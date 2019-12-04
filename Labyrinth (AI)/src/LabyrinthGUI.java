@@ -481,6 +481,11 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 			phaseLabel.setText("Place the tile");
 			board.removeHighlight();
 			turnLabel.setText(String.format("P%d's Turn", turn + 1));
+			
+			//Move player if they are an AI
+			if(players[turn] instanceof AI)
+				moveAI();
+			
 		}
 
 	}
@@ -951,175 +956,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 			
 			if(e.getKeyCode() == KeyEvent.VK_ENTER && players[turn] instanceof AI) {
 				
-				System.out.println("\nInitiating AI Move");
-				System.out.println("player " + (turn + 1) + "'s turn");
-				
-				AI p = (AI)(players[turn]);
-				Position movement = p.move();
-				
-				//Set the rotation variable of the tile
-				tileInHand.setRotation(p.getRotation());
-				
-				//System.out.println("push = " + p.getPush() + " rotation = " + p.getRotation());
-				
-				if(phase == 0) { // && p.getPush() >= 0 && p.getPush() != lastPush && 
-
-					//Push a column down
-					for(int i = 0; i < 3; i++) { 
-
-						if(p.getPush() == i) {
-
-							int col = (i + 1) * 2;
-
-							board.getBoard()[0][col].copy(tileInHand);
-							board.pushColDown(col);
-
-							tileInHand.copy(board.getBoard()[8][col]);
-
-							board.getBoard()[8][col] = new Tile();
-
-							//Move a player if they are on the selected column
-							for(int j = 0; j < 4; j++) {
-								if(players[j].getCol() == col) {
-									players[j].setRow(players[j].getRow() + 1);
-									if(players[j].getRow() == 8)
-										players[j].setRow(1);
-									updatePlayerLocation(j);
-								}
-							}
-
-						}
-					}
-
-					//Push a row left
-					for(int i = 3; i < 6; i++) { 
-
-						if(p.getPush() == i) {
-
-							int row = (i - 2) * 2;
-
-							board.getBoard()[row][8].copy(tileInHand);
-							board.pushRowLeft(row);
-
-							tileInHand.copy(board.getBoard()[row][0]);
-
-							board.getBoard()[row][0] = new Tile();
-
-							//Move a player if they are on the selected row
-							for(int j = 0; j < 4; j++) {
-								if(players[j].getRow() == row) {
-									players[j].setCol(players[j].getCol() - 1);
-									if(players[j].getCol() == 0)
-										players[j].setCol(7);
-									updatePlayerLocation(j);
-								}
-							}
-
-						}
-					}
-
-					//Push a column up
-					for(int i = 6; i < 9; i++) {
-
-						if(p.getPush() == i) {
-
-							int col = (9 - i) * 2;
-
-							board.getBoard()[8][col].copy(tileInHand);
-							board.pushColUp(col);
-
-							tileInHand.copy(board.getBoard()[0][col]);
-
-							board.getBoard()[0][col] = new Tile();
-
-							//Move a player if they are on the selected column
-							for(int j = 0; j < 4; j++) {
-								if(players[j].getCol() == col) {
-									players[j].setRow(players[j].getRow() - 1);
-									if(players[j].getRow() == 0)
-										players[j].setRow(7);
-									updatePlayerLocation(j);
-								}
-							}
-
-						}
-					}
-
-					//Push a row right
-					for(int i = 9; i < 12; i++) {
-
-						if(p.getPush() == i) {
-
-							int row = (12 - i) * 2;
-
-							board.getBoard()[row][0].copy(tileInHand);
-							board.pushRowRight(row);
-
-							tileInHand.copy(board.getBoard()[row][8]);
-
-							board.getBoard()[row][8] = new Tile();
-
-							//Move a player if they are on the selected row
-							for(int j = 0; j < 4; j++) {
-								if(players[j].getRow() == row) {
-									players[j].setCol(players[j].getCol() + 1);
-									if(players[j].getCol() == 8)
-										players[j].setCol(1);
-									updatePlayerLocation(j);
-								}
-							}
-
-						}
-					}
-
-					//Update the label with the tile in hand image
-					tileInHandLabel.setIcon(new ImageIcon(((ImageIcon) tileInHand.getIcon()).
-							getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
-
-					//return the push buttons to normal
-					for(int j = 0; j < 12; j++) {
-						//Change the button image and revert all other button images to normal
-						pushButton[j].setIcon(null);
-					}
-
-					//Set last push variable
-					if(p.getPush() == 0) {
-						lastPush = 8;
-					} else if(p.getPush() == 1) {
-						lastPush = 7;
-					} else if(p.getPush() == 2) {
-						lastPush = 6;
-					} else if(p.getPush() == 3) {
-						lastPush = 11;
-					} else if(p.getPush() == 4) {
-						lastPush = 10;
-					} else if(p.getPush() == 5) {
-						lastPush = 9;
-					} else if(p.getPush() == 6) {
-						lastPush = 2;
-					} else if(p.getPush() == 7) {
-						lastPush = 1;
-					} else if(p.getPush() == 8) {
-						lastPush = 0;
-					} else if(p.getPush() == 9) {
-						lastPush = 5;
-					} else if(p.getPush() == 10) {
-						lastPush = 4;
-					} else if(p.getPush() == 11) {
-						lastPush = 3;
-					}
-					//Reset selected push variable
-					selectedPush = -1;
-
-					//Move to player movement phase
-					nextPhase();
-					
-					//System.out.println("travelling to " + movement.getRow() + " " + movement.getCol());
-					selectedRow = movement.getRow();
-					selectedCol = movement.getCol();
-					movePlayer(turn, selectedRow, selectedCol);
-					
-				}
+				moveAI();
 
 			}
 			
@@ -1137,6 +974,179 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void moveAI() {
+		
+		System.out.println("\nInitiating AI Move");
+		System.out.println("player " + (turn + 1) + "'s turn");
+		
+		AI p = (AI)(players[turn]);
+		Position movement = p.move();
+		
+		//Set the rotation variable of the tile
+		tileInHand.setRotation(p.getRotation());
+		
+		//System.out.println("push = " + p.getPush() + " rotation = " + p.getRotation());
+		
+		if(phase == 0) { // && p.getPush() >= 0 && p.getPush() != lastPush && 
+
+			//Push a column down
+			for(int i = 0; i < 3; i++) { 
+
+				if(p.getPush() == i) {
+
+					int col = (i + 1) * 2;
+
+					board.getBoard()[0][col].copy(tileInHand);
+					board.pushColDown(col);
+
+					tileInHand.copy(board.getBoard()[8][col]);
+
+					board.getBoard()[8][col] = new Tile();
+
+					//Move a player if they are on the selected column
+					for(int j = 0; j < 4; j++) {
+						if(players[j].getCol() == col) {
+							players[j].setRow(players[j].getRow() + 1);
+							if(players[j].getRow() == 8)
+								players[j].setRow(1);
+							updatePlayerLocation(j);
+						}
+					}
+
+				}
+			}
+
+			//Push a row left
+			for(int i = 3; i < 6; i++) { 
+
+				if(p.getPush() == i) {
+
+					int row = (i - 2) * 2;
+
+					board.getBoard()[row][8].copy(tileInHand);
+					board.pushRowLeft(row);
+
+					tileInHand.copy(board.getBoard()[row][0]);
+
+					board.getBoard()[row][0] = new Tile();
+
+					//Move a player if they are on the selected row
+					for(int j = 0; j < 4; j++) {
+						if(players[j].getRow() == row) {
+							players[j].setCol(players[j].getCol() - 1);
+							if(players[j].getCol() == 0)
+								players[j].setCol(7);
+							updatePlayerLocation(j);
+						}
+					}
+
+				}
+			}
+
+			//Push a column up
+			for(int i = 6; i < 9; i++) {
+
+				if(p.getPush() == i) {
+
+					int col = (9 - i) * 2;
+
+					board.getBoard()[8][col].copy(tileInHand);
+					board.pushColUp(col);
+
+					tileInHand.copy(board.getBoard()[0][col]);
+
+					board.getBoard()[0][col] = new Tile();
+
+					//Move a player if they are on the selected column
+					for(int j = 0; j < 4; j++) {
+						if(players[j].getCol() == col) {
+							players[j].setRow(players[j].getRow() - 1);
+							if(players[j].getRow() == 0)
+								players[j].setRow(7);
+							updatePlayerLocation(j);
+						}
+					}
+
+				}
+			}
+
+			//Push a row right
+			for(int i = 9; i < 12; i++) {
+
+				if(p.getPush() == i) {
+
+					int row = (12 - i) * 2;
+
+					board.getBoard()[row][0].copy(tileInHand);
+					board.pushRowRight(row);
+
+					tileInHand.copy(board.getBoard()[row][8]);
+
+					board.getBoard()[row][8] = new Tile();
+
+					//Move a player if they are on the selected row
+					for(int j = 0; j < 4; j++) {
+						if(players[j].getRow() == row) {
+							players[j].setCol(players[j].getCol() + 1);
+							if(players[j].getCol() == 8)
+								players[j].setCol(1);
+							updatePlayerLocation(j);
+						}
+					}
+
+				}
+			}
+
+			//Update the label with the tile in hand image
+			tileInHandLabel.setIcon(new ImageIcon(((ImageIcon) tileInHand.getIcon()).
+					getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+
+			//return the push buttons to normal
+			for(int j = 0; j < 12; j++) {
+				//Change the button image and revert all other button images to normal
+				pushButton[j].setIcon(null);
+			}
+
+			//Set last push variable
+			if(p.getPush() == 0) {
+				lastPush = 8;
+			} else if(p.getPush() == 1) {
+				lastPush = 7;
+			} else if(p.getPush() == 2) {
+				lastPush = 6;
+			} else if(p.getPush() == 3) {
+				lastPush = 11;
+			} else if(p.getPush() == 4) {
+				lastPush = 10;
+			} else if(p.getPush() == 5) {
+				lastPush = 9;
+			} else if(p.getPush() == 6) {
+				lastPush = 2;
+			} else if(p.getPush() == 7) {
+				lastPush = 1;
+			} else if(p.getPush() == 8) {
+				lastPush = 0;
+			} else if(p.getPush() == 9) {
+				lastPush = 5;
+			} else if(p.getPush() == 10) {
+				lastPush = 4;
+			} else if(p.getPush() == 11) {
+				lastPush = 3;
+			}
+			//Reset selected push variable
+			selectedPush = -1;
+
+			//Move to player movement phase
+			nextPhase();
+			
+			//System.out.println("travelling to " + movement.getRow() + " " + movement.getCol());
+			selectedRow = movement.getRow();
+			selectedCol = movement.getCol();
+			movePlayer(turn, selectedRow, selectedCol);
+			
+		}
 	}
 
 }

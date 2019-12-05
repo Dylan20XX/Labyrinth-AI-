@@ -538,7 +538,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 
 	//This method displays the player victory screen after the game is won
 	private void playerVictory(int player) {
-		System.out.printf("P%d Wins", player);
+		System.out.printf("P%d Wins\n", player);
 		new LabyrinthVictoryScreen(player);
 		this.dispose();
 	}
@@ -613,8 +613,10 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 								}
 								
 								//If there is one player remaining, end the game
-								if(numPlayers <= 1)
+								if(numPlayers <= 1) {
 									playerVictory(winner);
+									return;
+								}
 								
 							}
 								
@@ -976,6 +978,7 @@ public class LabyrinthGUI extends JFrame implements ActionListener, KeyListener{
 		
 	}
 	
+	//This method moves an AI player
 	private void moveAI() {
 		
 		System.out.println("\nInitiating AI Move");

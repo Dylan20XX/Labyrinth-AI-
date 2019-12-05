@@ -48,7 +48,7 @@ public class AI extends Player{
 	
 	private Position position = new Position();
 	
-	
+	//Constructor method
 	public AI(ImageIcon image, int row, int col, int playerNum) {
 		super(image, row, col);
 		this.playerNum = playerNum;
@@ -66,6 +66,7 @@ public class AI extends Player{
 		
 	}
 	
+	//Getters and setters
 	public Board getBoard() {
 		return board;
 	}
@@ -150,14 +151,19 @@ public class AI extends Player{
 		
 	}
 	
+	//This method chooses the appropriate type of move for the AI player
 	private void choseActionPriority() {
 		
 		board.pathfind(getRow(), getCol());
 		treasurePath = false;
 		
+		shortestTreasureDis = 50;
+		numTreasuresShortestDis = 0;
+		
 		if(getHand().size() >= 2 && (handSizes[0] == 1 || handSizes[1] == 1 || handSizes[2] == 1)) { 
 			
 			//If you have more than 1 card and another player(s) has 1, try to block that player(s)
+			System.out.println("Blocking");
 			block(tileInHand);
 			
 		} else {
@@ -182,9 +188,6 @@ public class AI extends Player{
 		Tile tile = new Tile();
 		tile.copy(tileInHand);
 		int points = 0;
-		
-		shortestTreasureDis = 50;
-		numTreasuresShortestDis = 0;
 		
 		for(int c = 0; c < 12; c++) {
 			
@@ -553,7 +556,7 @@ public class AI extends Player{
 				if(awardedPoints + treasurePoints > points) {
 					points = awardedPoints + treasurePoints ;
 					selectedRow = Board.nodeNumToRow(i);
-					selectedCol = Board.nodeNumToCol(i);
+					selectedCol = Board.nodeNumToCol(i);				
 					push = selectedPush;
 					rotation = selectedRotation;
 					//System.out.println("selecting " + selectedRow + " " + selectedCol);
@@ -772,6 +775,8 @@ public class AI extends Player{
 		
 	}	
 	
+	//This method copies the board
+	
 	//This method is used to copy the board from the GUI
 	private void copyBoard(Board boardToCopy) {
 		
@@ -785,6 +790,8 @@ public class AI extends Player{
 		}
 		
 	}
+	
+	//This method pushes a column down
 	
 	//This method pushes a column down
 	private void pushColDown(int col, Tile tile) {
@@ -815,6 +822,8 @@ public class AI extends Player{
 	}
 	
 	//This method pushes a column up
+	
+	//This method pushes a column up
 	private void pushColUp(int col, Tile tile) {
 		
 		board.getBoard()[8][col].copy(tile);
@@ -843,6 +852,8 @@ public class AI extends Player{
 	}
 	
 	//This method pushes a column to the right
+	
+	//This method pushes a row to the right
 	private void pushRowRight(int row, Tile tile) {
 		
 		board.getBoard()[row][0].copy(tile);
@@ -871,6 +882,8 @@ public class AI extends Player{
 	}
 	
 	//This method pushes a column to the left
+	
+	//This method pushes a row to the left
 	private void pushRowLeft(int row, Tile tile) {
 		
 		board.getBoard()[row][8].copy(tile);
@@ -899,6 +912,8 @@ public class AI extends Player{
 	}
 	
 	//This method blocks the selected player by trying to prevent the targeted player from having any path to collect a treasure
+	
+	//This method allows the AI to chose a move that will block players
 	private void block(Tile tileInHand) {
 		
 		Tile tile = new Tile();
@@ -1029,6 +1044,7 @@ public class AI extends Player{
 	}
 	
 	//This method awards points to a move intended to block a player 
+	//This method awards points to a move based on the number of players blocked
 	private int blockPoints() {
 		
 		int points = 0;
@@ -1057,6 +1073,8 @@ public class AI extends Player{
 	}
 	
 	//This method awards points to a move intended to collect a treasure
+	
+	//This method awards points to a move based on the number of treasures on the path and players blocked
 	private int movePoints() {
 		
 		int points = 0;
@@ -1087,6 +1105,8 @@ public class AI extends Player{
 	}
 	
 	//This method awards points if a move allows a treasure to be collected next turn
+	
+	//This method awards points to a simulated second move based on the number of treasures on the path
 	private int secondMovePoints() {
 		
 		int points = 0;
@@ -1098,9 +1118,10 @@ public class AI extends Player{
 		
 	}
 	
+	//This method finds the shortest distance from space on the board to a treasure
+	
 	//This method returns the shortest distance to a treasure on the board
 	private int findShortestTreasureDis() {
-		
 		
 		ArrayList<Integer> distances = board.pathfindDis(getRow(), getCol(), getHand());
 		
@@ -1114,6 +1135,8 @@ public class AI extends Player{
 	}
 	
 	//This method returns the number of treasures with shortest distance from the player
+	
+	//This method finds the number of treasures that are the shortest distance away
 	private int findNumTreasuresShortestDis() {
 		
 		ArrayList<Integer> distances = board.pathfindDis(getRow(), getCol(), getHand());
@@ -1139,10 +1162,14 @@ public class AI extends Player{
 	}
 	
 	//This method copies the row and column values from the start of the turn
+	
+	//This method copies the start position of the player
 	private void copyStartPosition() {
 		setRow(startRow);
 		setCol(startCol);
 	}
+	
+	//This method copies the players from the LabyrinthGUI class
 	
 	//This method copies the players from the LabyrinthGUI class
 	private void copyPlayers() {
@@ -1153,6 +1180,8 @@ public class AI extends Player{
 		
 	}
 	
+	//This method copies a player array used in a simulated move
+	
 	//This method is used to copy a given player array
 	private void copyPlayers(Player[] simPlayers) {
 		
@@ -1161,6 +1190,8 @@ public class AI extends Player{
 		}
 		
 	}
+	
+	//This method prints the board
 	
 	//This method is used to print the board while testing
 	private void printBoard() {
@@ -1181,6 +1212,8 @@ public class AI extends Player{
 	}
 	
 	//This method is used to print spaces on the board that can be visited while testing
+	
+	//This method prints all of the available paths on the board
 	private void printVis() {
 		
 
